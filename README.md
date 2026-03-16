@@ -103,7 +103,7 @@ This architecture helps maintain clean and organized code.
 ##  Installation
 
 ### 1 Clone the repository
-git clone https://github.com/yourusername/campusmate.git
+git clone 
 
 ### 2 Navigate to project folder
 cd campusmate
