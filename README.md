@@ -90,18 +90,16 @@ This architecture helps maintain clean and organized code.
 
 ## Project Structure
 CampusMate
-│
-├── app.py
-├── templates
-├── static
-│   ├── css
-│   ├── js
-│   └── images
-│
-├── uploads
-├── database
-├── requirements.txt
-└── README.md
+-> app.py
+->templates
+->static
+    -> css  
+    ->js
+    ->images
+-> uploads
+->database
+->requirements.txt
+->README.md
 
 ##  Installation
 
