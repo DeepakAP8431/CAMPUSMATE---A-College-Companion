@@ -89,17 +89,17 @@ This architecture helps maintain clean and organized code.
 * Web browser (Chrome / Firefox / Edge)
 
 ## Project Structure
-CampusMate
--> app.py
-->templates
-->static
-    -> css  
-    ->js
-    ->images
--> uploads
-->database
-->requirements.txt
-->README.md
+*CampusMate
+*-> app.py
+*->templates
+*->static
+    **-> css  
+    **->js
+    **->images
+*-> uploads
+*->database
+*->requirements.txt
+*->README.md
 
 ##  Installation
 
