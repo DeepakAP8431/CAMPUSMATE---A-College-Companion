@@ -94,7 +94,6 @@ This architecture helps maintain clean and organized code.
 ->templates
 ->static
     ->css  
-    ->js
     ->images
 ->uploads
 ->database
