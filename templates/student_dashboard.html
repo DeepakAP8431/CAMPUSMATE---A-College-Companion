@@ -1,0 +1,214 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="student-dashboard text-center">
+    <!-- START: ADD THIS LOGO BLOCK -->
+    <div class="logo-container mb-4">
+        <!-- Make sure you have saved your logo to static/images/logo.jpg -->
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="CampusMate Logo" class="dashboard-logo">
+    </div>
+    <!-- END: ADD THIS BLOCK -->
+    <h1 class="mb-4">Welcome to CampusMate! 🚀</h1>
+    <p class="lead"><b>-Your Academic Life,Organised and Simplified</b> </p>
+    <p class="lead">Select your semester and division to view schedules, notes, and more.</p>
+
+    <form method="GET" action="{{ url_for('student_dashboard') }}" class="row g-3 justify-content-center mb-5">
+    <div class="col-auto">
+        <label for="semester" class="visually-hidden">Semester</label>
+        <select name="semester" id="semester" class="form-select form-select-lg" required>
+            <option value="" disabled {% if not sem %}selected{% endif %}>Select Semester</option>
+
+            {% for i in range(1, 9) %}
+                <option value="{{ i }}" {% if sem == i|string %}selected{% endif %}>Semester {{ i }}</option>
+            {% endfor %}
+
+        </select>
+    </div>
+    <div class="col-auto">
+        <label for="division" class="visually-hidden">Division</label>
+        <select name="division" id="division" class="form-select form-select-lg" required>
+            <option value="" disabled {% if not div %}selected{% endif %}>Select Division</option>
+
+            <option value="A" {% if div == 'A' %}selected{% endif %}>A</option>
+            <option value="B" {% if div == 'B' %}selected{% endif %}>B</option>
+            <option value="C" {% if div == 'C' %}selected{% endif %}>C</option>
+
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-lg">Fetch Details</button>
+    </div>
+    </form>
+    
+    {% if sem and div %}
+       <div class="row row-cols-1 row-cols-md-2 g-4">
+
+        <!-- Notice Board -->
+        <div class="col">
+            <div class="card h-100 feature-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-bullhorn text-primary"></i> Notice Board</h5>
+                    <div class="accordion" id="noticeAccordion">
+                        {% for item in content.notice %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingNotice{{ item.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotice{{ item.id }}">
+                                    {{ item.title }} <small class="ms-auto text-muted">{{ item.upload_date.strftime('%d-%b-%Y') }}</small>
+                                </button>
+                            </h2>
+                            <div id="collapseNotice{{ item.id }}" class="accordion-collapse collapse" data-bs-parent="#noticeAccordion">
+                                <div class="accordion-body">
+                                    <p>{{ item.description }}</p>
+                                    <p><small class="text-muted">By: {{ item.author.username }}</small></p>
+                                    {% if item.file_path %}
+                                    <a href="{{ url_for('serve_file', filename=item.file_path) }}" target="_blank" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ url_for('download_file', filename=item.file_path) }}" class="btn btn-sm btn-success">Download</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p>No notices found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes & Resources -->
+        <div class="col">
+            <div class="card h-100 feature-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-book-open text-success"></i> Notes & Resources</h5>
+                    {% for faculty, notes in content.notes.items() %}
+                        <h6>Notes by: {{ faculty }}</h6>
+                        <div class="accordion mb-3" id="notesAccordion{{ faculty }}">
+                            {% for item in notes %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNote{{ item.id }}">
+                                        {{ item.title }}<small class="ms-auto text-muted">{{ item.upload_date.strftime('%d-%b-%Y') }}</small>
+                                    </button>
+                                </h2>
+                                <div id="collapseNote{{ item.id }}" class="accordion-collapse collapse" data-bs-parent="#notesAccordion{{ faculty }}">
+                                    <div class="accordion-body">
+                                        <p>{{ item.description }}</p>
+                                        {% if item.file_path %}
+                                        <a href="{{ url_for('serve_file', filename=item.file_path) }}" target="_blank" class="btn btn-sm btn-info">View</a>
+                                        <a href="{{ url_for('download_file', filename=item.file_path) }}" class="btn btn-sm btn-success">Download</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No notes found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignments -->
+        <div class="col">
+            <div class="card h-100 feature-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-tasks text-danger"></i> Assignments</h5>
+                    {% for faculty, assignments in content.assignment.items() %}
+                        <h6>Assignments by: {{ faculty }}</h6>
+                        <div class="accordion mb-3" id="assignAccordion{{ faculty }}">
+                            {% for item in assignments %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAssign{{ item.id }}">
+                                        {{ item.title }} <small class="ms-auto text-muted">{{ item.upload_date.strftime('%d-%b-%Y') }}</small>
+                                        <small class="ms-auto text-danger">Deadline: {{ item.deadline.strftime('%d-%b-%Y') }}</small>
+                                    </button>
+                                </h2>
+                                <div id="collapseAssign{{ item.id }}" class="accordion-collapse collapse" data-bs-parent="#assignAccordion{{ faculty }}">
+                                    <div class="accordion-body">
+                                        <p>{{ item.description }}</p>
+                                        {% if item.file_path %}
+                                        <a href="{{ url_for('serve_file', filename=item.file_path) }}" target="_blank" class="btn btn-sm btn-info">View</a>
+                                        <a href="{{ url_for('download_file', filename=item.file_path) }}" class="btn btn-sm btn-success">Download</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No assignments found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Timetable -->
+        <div class="col">
+            <div class="card h-100 feature-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-alt text-info"></i> Timetable</h5>
+                    <div class="accordion" id="timetableAccordion">
+                        {% for item in content.timetable %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTimetable{{ item.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTimetable{{ item.id }}">
+                                    {{ item.title }} <small class="ms-auto text-muted">{{ item.upload_date.strftime('%d-%b-%Y') }}</small>
+                                </button>
+                            </h2>
+                            <div id="collapseTimetable{{ item.id }}" class="accordion-collapse collapse" data-bs-parent="#timetableAccordion">
+                                <div class="accordion-body">
+                                    <p>{{ item.description }}</p>
+                                    <p><small class="text-muted">By: {{ item.author.username }}</small></p>
+                                    {% if item.file_path %}
+                                    <a href="{{ url_for('serve_file', filename=item.file_path) }}" target="_blank" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ url_for('download_file', filename=item.file_path) }}" class="btn btn-sm btn-success">Download</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                            <p>No timetable found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events -->
+        <div class="col">
+            <div class="card h-100 feature-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-day text-warning"></i> Events</h5>
+                    <div class="accordion" id="eventAccordion">
+                        {% for item in content.event %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingEvent{{ item.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvent{{ item.id }}">
+                                    {{ item.title }}<small class="ms-auto text-muted">{{ item.upload_date.strftime('%d-%b-%Y') }}</small>
+                                    <small class="ms-auto text-danger">Event Day: {{ item.deadline.strftime('%d-%b-%Y') }} </small>
+                                </button>
+                            </h2>
+                            <div id="collapseEvent{{ item.id }}" class="accordion-collapse collapse" data-bs-parent="#eventAccordion">
+                                <div class="accordion-body">
+                                    <p>{{ item.description }}</p>
+                                    <p><small class="text-muted">By: {{ item.author.username }}</small></p>
+                                    {% if item.file_path %}
+                                    <a href="{{ url_for('serve_file', filename=item.file_path) }}" target="_blank" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ url_for('download_file', filename=item.file_path) }}" class="btn btn-sm btn-success">Download</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                            <p>No events found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

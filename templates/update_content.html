@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Update: {{ content.title }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-control" value="{{ content.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3">{{ content.description }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Semester</label>
+                            <select name="semester" class="form-select" required multiple size="8">
+                                {% set selected_sems = content.semester.split(',') %}
+                                {% for i in range(1, 9) %}
+                                    <option value="{{ i }}" {% if i|string in selected_sems %}selected{% endif %}>Semester {{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Division</label>
+                            <select name="division" class="form-select" required multiple size="3">
+                                {% set selected_divs = content.division.split(',') %}
+                                {% for div in ['A', 'B', 'C'] %}
+                                    <option value="{{ div }}" {% if div in selected_divs %}selected{% endif %}>{{ div }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    {% if content.content_type == 'assignment' %}
+                    <div class="mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" name="deadline" class="form-control" value="{{ content.deadline.strftime('%Y-%m-%d') if content.deadline }}">
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Upload New File (Optional, will replace existing)</label>
+                        <input type="file" name="file" class="form-control">
+                        {% if content.file_path %}
+                        <div class="form-text">Current file: {{ content.file_path }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{{ url_for('your_uploads') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

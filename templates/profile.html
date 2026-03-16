@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Your Profile</h2>
+                
+                <div class="text-center mb-4">
+                    {% if current_user.profile_image %}
+                        <img src="{{ url_for('serve_profile_pic', filename=current_user.profile_image) }}" alt="Profile Picture" class="img-thumbnail rounded-circle" width="150">
+                    {% else %}
+                        <i class="fas fa-user-circle fa-8x text-muted"></i>
+                    {% endif %}
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="profile_pic" class="form-label">Update Profile Picture</label>
+                        <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/png, image/jpeg, image/jpg">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Upload Picture</button>
+                    </div>
+                </form>
+                
+                {% if current_user.profile_image %}
+                <form action="{{ url_for('remove_profile_pic') }}" method="POST" class="d-grid mt-2">
+                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to remove your picture?');">
+                        <i class="fas fa-trash-alt"></i> Remove Picture
+                    </button>
+                </form>
+                {% endif %}
+                <hr>
+                
+                <div class="mt-4">
+                    <p><strong>Username:</strong> {{ current_user.username }}</p>
+                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                    <p><strong>Role:</strong> {{ current_user.role.capitalize() }}</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+               
