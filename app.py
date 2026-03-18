@@ -329,6 +329,7 @@ def delete_content(content_id):
         flash('Permission denied.', 'danger')
     return redirect(url_for('your_uploads'))
 
+
 @app.route('/manage_users', methods=['GET', 'POST'])
 @login_required
 def manage_users():
@@ -476,3 +477,4 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
